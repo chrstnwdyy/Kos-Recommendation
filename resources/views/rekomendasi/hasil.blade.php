@@ -154,13 +154,16 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="small fw-600 mb-1">Tipe Kos</label>
-                            <select name="tipe_kos" class="form-select form-select-sm">
-                                <option value="semua">Semua Tipe</option>
-                                @foreach($tipeOptions as $t)
-                                <option value="{{ $t }}" {{ ($constraints['tipe_kos'] ?? '') === $t ? 'selected' : '' }}>{{ $t }}</option>
-                                @endforeach
-                            </select>
+                            <label class="small fw-600 mb-1">Ukuran Kamar Min (m²)</label>
+                            <input type="number" name="room_size_min" class="form-control form-control-sm"
+                                   placeholder="misal: 6" min="0" step="0.5"
+                                   value="{{ $constraints['room_size_min'] ?? '' }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-600 mb-1">Ukuran Kamar Max (m²)</label>
+                            <input type="number" name="room_size_max" class="form-control form-control-sm"
+                                   placeholder="misal: 20" min="0" step="0.5"
+                                   value="{{ $constraints['room_size_max'] ?? '' }}">
                         </div>
                         <div class="mb-3">
                             <label class="small fw-600 mb-1">Fasilitas</label>
@@ -401,6 +404,7 @@ const kosData = {
         rating:       "{{ $kos->rating ?? '-' }}",
         rating_count: {{ $kos->rating_count ?? 0 }},
         room_size:    "{{ addslashes($kos->room_size ?? '-') }}",
+        room_size_m2: "{{ $kos->room_size_m2 ?? '' }}",
         availability: "{{ addslashes($kos->room_availability ?? 'Tersedia') }}",
         deposit:      "{{ addslashes($kos->deposit_amount ?? '-') }}",
         facilities:   {!! json_encode($kos->facilities_array) !!},
@@ -464,7 +468,7 @@ function showDetail(id) {
                 <div class="row g-2 mb-3">
                     ${infoCell('bi-house','Tipe', k.tipe_kos)}
                     ${infoCell('bi-rulers','Ukuran', k.room_size)}
-                    ${infoCell('bi-lightning','Listrik', k.electricity || '-')}
+                    ${k.room_size_m2 ? infoCell('bi-rulers','Luas Kamar', k.room_size_m2 + ' m²') : ''}
                     ${infoCell('bi-door-open','Ketersediaan', k.availability || 'Tersedia')}
                     ${k.deposit && k.deposit !== 'Not found' && k.deposit !== '-' ? infoCell('bi-cash','Deposit', k.deposit) : ''}
                     ${k.rating !== '-' ? infoCell('bi-star-fill','Rating', k.rating + (k.rating_count ? ' (' + k.rating_count + ' ulasan)' : '')) : ''}

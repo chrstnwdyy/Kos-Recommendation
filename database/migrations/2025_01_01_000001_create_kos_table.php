@@ -19,7 +19,7 @@ return new class extends Migration
 
             // ── Ukuran kamar ───────────────────────────
             $table->string('room_size')->nullable();           // string asli: "3 x 4 meter"
-
+            $table->float('room_size_m2')->nullable();         // [PP-9] hasil kalkulasi: 12.0
             // ── Harga ──────────────────────────────────
             $table->integer('price');                          // [PP-1] integer bersih
             $table->string('price_display');                   // string asli untuk tampilan

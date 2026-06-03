@@ -4,44 +4,9 @@ namespace App\Services;
 
 use App\Models\Kos;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Builder;
 
-/**
- * KnowledgeBased Recommendation System dengan Constraint-Based Approach
- * 
- * Algoritma:
- * 1. Hard Constraint Filtering: Eliminasi kos yang tidak memenuhi batasan wajib
- *    (budget, region, tipe_kos)
- * 2. Soft Constraint Scoring: Hitung persentase kesesuaian fasilitas yang diminta
- *    Score = (Jumlah Fasilitas Cocok / Total Permintaan) × 100%
- * 3. Ranking: Urutkan berdasarkan score tertinggi, lalu harga terendah
- */
 class RecommendationService
 {
-    /**
-     * Fasilitas yang dianggap sebagai "key" facilities untuk scoring
-     */
-    private array $keyFacilities = [
-        'AC', 'WiFi', 'K. Mandi Dalam', 'K. Mandi Luar', 'Kasur',
-        'Lemari Baju', 'Meja', 'Kursi', 'TV', 'Kulkas', 'Mesin Cuci',
-        'Dapur', 'Parkir Motor', 'Parkir Mobil', 'CCTV', 'Laundry',
-        'Mushola', 'Balcon', 'Air panas', 'Kipas Angin',
-    ];
-
-    /**
-     * Main recommendation method
-     * 
-     * @param array $constraints
-     *   - budget_min (int): Harga minimum (optional)
-     *   - budget_max (int): Harga maksimum (required)
-     *   - region (string|null): Wilayah (Bogor, Depok, dll)
-     *   - tipe_kos (string|null): Kos Campur / Kos Putra / Kos Putri
-     *   - facilities (array): Fasilitas yang diinginkan
-     *   - electricity_included (bool|null): Listrik termasuk?
-     *   - limit (int): Jumlah hasil maksimum
-     * 
-     * @return array ['results' => Collection, 'total_filtered' => int, 'constraints_used' => array]
-     */
     public function recommend(array $constraints): array
     {
         // ── STEP 1: Hard Constraint Filtering ──────────────────────────────
@@ -60,18 +25,12 @@ class RecommendationService
             $query->where('region', $constraints['region']);
         }
 
-        // Tipe Kos
-        if (!empty($constraints['tipe_kos']) && $constraints['tipe_kos'] !== 'semua') {
-            $query->where('tipe_kos', $constraints['tipe_kos']);
+        // Ukuran Kamar (m²)
+        if (!empty($constraints['room_size_min'])) {
+            $query->where('room_size_m2', '>=', (float) $constraints['room_size_min']);
         }
-
-        // Listrik
-        if (isset($constraints['electricity_included']) && $constraints['electricity_included'] !== null) {
-            if ($constraints['electricity_included']) {
-                $query->where('all_facilities', 'like', '%Termasuk listrik%');
-            } else {
-                $query->where('all_facilities', 'like', '%Tidak termasuk listrik%');
-            }
+        if (!empty($constraints['room_size_max'])) {
+            $query->where('room_size_m2', '<=', (float) $constraints['room_size_max']);
         }
 
         $filtered = $query->get();
@@ -91,28 +50,22 @@ class RecommendationService
         });
 
         // ── STEP 3: Ranking ──────────────────────────────────────────────────
-        $limit = (int) ($constraints['limit'] ?? 12);
+        $limit = (int) ($constraints['limit'] ?? 20);
 
         $ranked = $scored
-            ->sortByDesc('match_score')
             ->sortBy(function ($kos) {
-                // Secondary sort: price asc (when score ties)
                 return [$kos->match_score * -1, $kos->price];
             })
             ->values()
             ->take($limit);
 
         return [
-            'results'           => $ranked,
-            'total_filtered'    => $totalFiltered,
-            'constraints_used'  => $this->describeConstraints($constraints),
+            'results'          => $ranked,
+            'total_filtered'   => $totalFiltered,
+            'constraints_used' => $this->describeConstraints($constraints),
         ];
     }
 
-    /**
-     * Constraint-Based Matching Score
-     * Score = (Jumlah Fasilitas Cocok / Total Permintaan) × 100%
-     */
     private function calculateMatchScore(Kos $kos, array $requestedFacilities): array
     {
         if (empty($requestedFacilities)) {
@@ -137,16 +90,13 @@ class RecommendationService
                     break;
                 }
             }
-            if ($found) {
-                $matched[] = $requested;
-            } else {
-                $missing[] = $requested;
-            }
+            if ($found) $matched[] = $requested;
+            else        $missing[] = $requested;
         }
 
-        $total = count($requestedFacilities);
+        $total        = count($requestedFacilities);
         $matchedCount = count($matched);
-        $percentage = $total > 0 ? round(($matchedCount / $total) * 100, 1) : 100.0;
+        $percentage   = $total > 0 ? round(($matchedCount / $total) * 100, 1) : 100.0;
 
         return [
             'percentage'   => $percentage,
@@ -157,9 +107,6 @@ class RecommendationService
         ];
     }
 
-    /**
-     * Build human-readable constraint description
-     */
     private function describeConstraints(array $constraints): array
     {
         $desc = [];
@@ -178,37 +125,29 @@ class RecommendationService
             $desc[] = ['label' => 'Wilayah', 'value' => $constraints['region'], 'icon' => 'bi-geo-alt'];
         }
 
-        if (!empty($constraints['tipe_kos']) && $constraints['tipe_kos'] !== 'semua') {
-            $desc[] = ['label' => 'Tipe Kos', 'value' => $constraints['tipe_kos'], 'icon' => 'bi-house'];
+        if (!empty($constraints['room_size_min']) || !empty($constraints['room_size_max'])) {
+            $min = $constraints['room_size_min'] ?? '0';
+            $max = $constraints['room_size_max'] ?? '∞';
+            $desc[] = ['label' => 'Ukuran Kamar', 'value' => $min . ' m² – ' . $max . ' m²', 'icon' => 'bi-rulers'];
         }
 
         if (!empty($constraints['facilities'])) {
             $desc[] = ['label' => 'Fasilitas', 'value' => implode(', ', $constraints['facilities']), 'icon' => 'bi-check2-circle'];
         }
 
-        if (isset($constraints['electricity_included']) && $constraints['electricity_included'] !== null) {
-            $val = $constraints['electricity_included'] ? 'Termasuk Listrik' : 'Tidak Termasuk Listrik';
-            $desc[] = ['label' => 'Listrik', 'value' => $val, 'icon' => 'bi-lightning'];
-        }
-
         return $desc;
     }
 
-    /**
-     * Get statistics for a set of results
-     */
     public function getStats(Collection $results): array
     {
-        if ($results->isEmpty()) {
-            return [];
-        }
+        if ($results->isEmpty()) return [];
 
         return [
-            'avg_price'      => (int) $results->avg('price'),
-            'min_price'      => (int) $results->min('price'),
-            'max_price'      => (int) $results->max('price'),
-            'avg_score'      => round($results->avg('match_score'), 1),
-            'perfect_match'  => $results->where('match_score', 100)->count(),
+            'avg_price'     => (int) $results->avg('price'),
+            'min_price'     => (int) $results->min('price'),
+            'max_price'     => (int) $results->max('price'),
+            'avg_score'     => round($results->avg('match_score'), 1),
+            'perfect_match' => $results->where('match_score', 100)->count(),
         ];
     }
 }

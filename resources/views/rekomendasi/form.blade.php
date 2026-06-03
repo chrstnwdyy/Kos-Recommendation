@@ -105,7 +105,7 @@
                     <div class="step-num">1</div> Budget & Wilayah
                 </div>
                 <div class="step-tab" data-step="2" onclick="goStep(2)">
-                    <div class="step-num">2</div> Tipe & Listrik
+                    <div class="step-num">2</div> Ukuran Kamar
                 </div>
                 <div class="step-tab" data-step="3" onclick="goStep(3)">
                     <div class="step-num">3</div> Fasilitas
@@ -187,58 +187,63 @@
                     </div>
                 </div>
 
-                <!-- ── STEP 2: Tipe & Listrik ── -->
+                <!-- ── STEP 2: Ukuran Kamar ── -->
                 <div class="step-panel" id="step2">
-                    <h5 class="fw-700 mb-1">🏠 Tipe Kos & Listrik</h5>
-                    <p class="text-muted small mb-4">Pilih tipe kos yang sesuai dan preferensi listrik</p>
+                    <h5 class="fw-700 mb-1">📐 Ukuran Kamar</h5>
+                    <p class="text-muted small mb-4">Tentukan rentang luas kamar yang Anda inginkan (dalam m²)</p>
 
-                    <!-- Tipe Kos -->
                     <div class="mb-4">
-                        <label class="fw-600 mb-3">Tipe Kos</label>
-                        <div class="tipe-card-wrap">
-                            @php $tipeIcons = ['Kos Campur'=>'bi-people-fill','Kos Putra'=>'bi-gender-male','Kos Putri'=>'bi-gender-female']; @endphp
-                            <label class="tipe-card active" id="tipe-semua">
-                                <input type="radio" name="tipe_kos" value="semua" checked>
-                                <i class="bi bi-house-fill text-primary"></i>
-                                <div class="fw-600 small">Semua Tipe</div>
-                                <div class="text-muted" style="font-size:0.7rem;">Campur/Putra/Putri</div>
-                            </label>
-                            @foreach($tipeOptions as $t)
-                            <label class="tipe-card" id="tipe-{{ Str::slug($t) }}">
-                                <input type="radio" name="tipe_kos" value="{{ $t }}">
-                                <i class="bi {{ $tipeIcons[$t] ?? 'bi-house' }}" style="color:#06B6D4;"></i>
-                                <div class="fw-600 small">{{ $t }}</div>
-                                <div class="text-muted" style="font-size:0.7rem;">
-                                    @if($t=='Kos Campur') Laki-laki & Perempuan
-                                    @elseif($t=='Kos Putra') Khusus Laki-laki
-                                    @else Khusus Perempuan @endif
-                                </div>
-                            </label>
-                            @endforeach
+                        <label class="fw-600 mb-2">Ukuran Kamar Minimum (m²)</label>
+                        <div class="input-group" style="max-width:280px;">
+                            <input type="number" name="room_size_min" class="form-control"
+                                   placeholder="Contoh: 6" min="0" step="0.5">
+                            <span class="input-group-text bg-light">m²</span>
                         </div>
+                        <small class="text-muted mt-1 d-block">Kosongkan jika tidak ada batas minimum</small>
                     </div>
 
-                    <!-- Listrik -->
                     <div class="mb-4">
-                        <label class="fw-600 mb-3">Preferensi Listrik</label>
-                        <div class="d-flex gap-3 flex-wrap">
-                            <label class="listrik-opt active flex-fill">
-                                <input type="radio" name="electricity_included" value="" checked>
-                                <i class="bi bi-question-circle fs-4 d-block mb-1 text-muted"></i>
-                                <div class="fw-600 small">Tidak Dipilih</div>
-                            </label>
-                            <label class="listrik-opt flex-fill">
-                                <input type="radio" name="electricity_included" value="ya">
-                                <i class="bi bi-lightning-charge-fill fs-4 d-block mb-1 text-warning"></i>
-                                <div class="fw-600 small">Termasuk Listrik</div>
-                                <div class="text-muted" style="font-size:0.7rem;">Harga sudah termasuk</div>
-                            </label>
-                            <label class="listrik-opt flex-fill">
-                                <input type="radio" name="electricity_included" value="tidak">
-                                <i class="bi bi-plug fs-4 d-block mb-1 text-muted"></i>
-                                <div class="fw-600 small">Tidak Termasuk</div>
-                                <div class="text-muted" style="font-size:0.7rem;">Bayar terpisah</div>
-                            </label>
+                        <label class="fw-600 mb-2">Ukuran Kamar Maksimum (m²)</label>
+                        <div class="input-group" style="max-width:280px;">
+                            <input type="number" name="room_size_max" class="form-control"
+                                   placeholder="Contoh: 20" min="0" step="0.5">
+                            <span class="input-group-text bg-light">m²</span>
+                        </div>
+                        <small class="text-muted mt-1 d-block">Kosongkan jika tidak ada batas maksimum</small>
+                    </div>
+
+                    <!-- Panduan ukuran -->
+                    <div class="p-3 rounded-3 mb-4" style="background:#F8FAFC;border:1px solid var(--border);">
+                        <div class="fw-600 small mb-2"><i class="bi bi-info-circle me-1 text-primary"></i>Referensi Ukuran Kamar</div>
+                        <div class="row g-2">
+                            <div class="col-6 col-md-3">
+                                <div class="text-center p-2 rounded-2" style="background:#EEF2FF;">
+                                    <div class="fw-700 small" style="color:var(--primary);">≤ 9 m²</div>
+                                    <div class="text-muted" style="font-size:0.7rem;">Kamar Kecil</div>
+                                    <div class="text-muted" style="font-size:0.65rem;">misal: 3×3</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="text-center p-2 rounded-2" style="background:#ECFDF5;">
+                                    <div class="fw-700 small" style="color:#10B981;">9 – 15 m²</div>
+                                    <div class="text-muted" style="font-size:0.7rem;">Kamar Sedang</div>
+                                    <div class="text-muted" style="font-size:0.65rem;">misal: 3×4</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="text-center p-2 rounded-2" style="background:#FFFBEB;">
+                                    <div class="fw-700 small" style="color:#F59E0B;">15 – 25 m²</div>
+                                    <div class="text-muted" style="font-size:0.7rem;">Kamar Besar</div>
+                                    <div class="text-muted" style="font-size:0.65rem;">misal: 4×5</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="text-center p-2 rounded-2" style="background:#FEE2E2;">
+                                    <div class="fw-700 small" style="color:#EF4444;">> 25 m²</div>
+                                    <div class="text-muted" style="font-size:0.7rem;">Kamar Luas</div>
+                                    <div class="text-muted" style="font-size:0.65rem;">misal: 5×6</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -414,22 +419,23 @@ document.querySelector('.region-opt[data-val=""]').style.borderColor = 'var(--pr
 document.querySelector('.region-opt[data-val=""]').style.background = '#EEF2FF';
 
 // ── Tipe Kos cards ─────────────────────────────────────────────
-document.querySelectorAll('.tipe-card').forEach(card => {
-    card.addEventListener('click', () => {
-        document.querySelectorAll('.tipe-card').forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        card.querySelector('input').checked = true;
-    });
-});
+//document.querySelectorAll('.tipe-card').forEach(card => {
+//    card.addEventListener('click', () => {
+//        document.querySelectorAll('.tipe-card').forEach(c => c.classList.remove('active'));
+//        card.classList.add('active');
+//        card.querySelector('input').checked = true;
+//    });
+//});
 
 // ── Listrik opts ───────────────────────────────────────────────
-document.querySelectorAll('.listrik-opt').forEach(opt => {
-    opt.addEventListener('click', () => {
-        document.querySelectorAll('.listrik-opt').forEach(o => o.classList.remove('active'));
-        opt.classList.add('active');
-        opt.querySelector('input').checked = true;
-    });
-});
+//document.querySelectorAll('.listrik-opt').forEach(opt => {
+//    opt.addEventListener('click', () => {
+//       document.querySelectorAll('.listrik-opt').forEach(o => o.classList.remove('active'));
+//        opt.classList.add('active');
+//        opt.querySelector('input').checked = true;
+//    });
+//}); 
+
 
 // ── Facility count ─────────────────────────────────────────────
 function updateFacCount() {
@@ -451,10 +457,6 @@ function buildSummary() {
     const budget   = formatRp(hiddenInput.value);
     const budgetMin = document.querySelector('[name=budget_min]').value;
     const region   = document.querySelector('[name=region]:checked')?.value || 'Semua Wilayah';
-    const tipe     = document.querySelector('[name=tipe_kos]:checked')?.value || 'Semua Tipe';
-    const elecEl   = document.querySelector('[name=electricity_included]:checked');
-    const elecVal  = elecEl?.value;
-    const elecText = elecVal === 'ya' ? 'Termasuk Listrik' : elecVal === 'tidak' ? 'Tidak Termasuk' : 'Tidak Dipilih';
     const facs     = [...document.querySelectorAll('.fac-cb:checked')].map(c => c.value);
 
     let html = '';
@@ -470,8 +472,12 @@ function buildSummary() {
     html += row('bi-cash-stack', 'Budget Maksimum', budget);
     if (budgetMin && budgetMin > 0) html += row('bi-cash', 'Budget Minimum', formatRp(budgetMin));
     html += row('bi-geo-alt-fill', 'Wilayah', region || 'Semua Wilayah');
-    html += row('bi-house', 'Tipe Kos', tipe === 'semua' ? 'Semua Tipe' : tipe);
-    html += row('bi-lightning', 'Listrik', elecText);
+    const roomMin = document.querySelector('[name=room_size_min]')?.value;
+    const roomMax = document.querySelector('[name=room_size_max]')?.value;
+    const roomText = roomMin || roomMax ? (roomMin || '0') + ' m² – ' + (roomMax || '∞') + ' m²' : 'Tidak dibatasi';
+    html += row('bi-rulers', 'Ukuran Kamar', roomText);
+    
+    
 
     if (facs.length > 0) {
         const pills = facs.map(f => `<span class="chip me-1 mb-1">${f}</span>`).join('');

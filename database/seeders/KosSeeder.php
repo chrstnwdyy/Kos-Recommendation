@@ -199,6 +199,7 @@ class KosSeeder extends Seeder
                 'region'                  => $region,
                 'location'                => $location ?: null,
                 'room_size'               => $item['room_size'] ?? null,
+                'room_size_m2'            => $roomSizeM2,
                 'is_electricity_included' => $electricity,
                 'all_facilities'          => $facilitiesClean,
                 'room_availability'       => $availability,
