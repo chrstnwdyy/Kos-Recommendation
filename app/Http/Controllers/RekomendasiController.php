@@ -34,13 +34,7 @@ class RekomendasiController extends Controller
             'tipe_kos'              => 'nullable|string',
             'facilities'            => 'nullable|array',
             'facilities.*'          => 'string',
-            'electricity_included'  => 'nullable|string',
         ]);
-
-        // Map electricity_included
-        $elec = null;
-        if ($request->electricity_included === 'ya') $elec = true;
-        elseif ($request->electricity_included === 'tidak') $elec = false;
 
         $constraints = [
             'budget_max'            => (int) $validated['budget_max'],
@@ -48,7 +42,6 @@ class RekomendasiController extends Controller
             'region'                => $validated['region'] ?? null,
             'tipe_kos'              => $validated['tipe_kos'] ?? null,
             'facilities'            => $validated['facilities'] ?? [],
-            'electricity_included'  => $elec,
             'limit'                 => 20,
         ];
 
@@ -106,8 +99,7 @@ class RekomendasiController extends Controller
                 'price_display'=> $k->formatted_price,
                 'tipe_kos'     => $k->tipe_kos,
                 'match_score'  => $k->match_score,
-                'image_url'    => $k->image,
-                'rating'       => $k->rating,
+                'image_url'    => $k->image_url, // Sesuaikan dengan nama kolom migration
             ]),
         ]);
     }

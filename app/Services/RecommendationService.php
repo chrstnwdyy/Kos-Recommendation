@@ -8,12 +8,11 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * KnowledgeBased Recommendation System dengan Constraint-Based Approach
- * 
- * Algoritma:
+ * * Algoritma:
  * 1. Hard Constraint Filtering: Eliminasi kos yang tidak memenuhi batasan wajib
- *    (budget, region, tipe_kos)
+ * (budget, region, tipe_kos)
  * 2. Soft Constraint Scoring: Hitung persentase kesesuaian fasilitas yang diminta
- *    Score = (Jumlah Fasilitas Cocok / Total Permintaan) × 100%
+ * Score = (Jumlah Fasilitas Cocok / Total Permintaan) × 100%
  * 3. Ranking: Urutkan berdasarkan score tertinggi, lalu harga terendah
  */
 class RecommendationService
@@ -30,17 +29,6 @@ class RecommendationService
 
     /**
      * Main recommendation method
-     * 
-     * @param array $constraints
-     *   - budget_min (int): Harga minimum (optional)
-     *   - budget_max (int): Harga maksimum (required)
-     *   - region (string|null): Wilayah (Bogor, Depok, dll)
-     *   - tipe_kos (string|null): Kos Campur / Kos Putra / Kos Putri
-     *   - facilities (array): Fasilitas yang diinginkan
-     *   - electricity_included (bool|null): Listrik termasuk?
-     *   - limit (int): Jumlah hasil maksimum
-     * 
-     * @return array ['results' => Collection, 'total_filtered' => int, 'constraints_used' => array]
      */
     public function recommend(array $constraints): array
     {
@@ -63,15 +51,6 @@ class RecommendationService
         // Tipe Kos
         if (!empty($constraints['tipe_kos']) && $constraints['tipe_kos'] !== 'semua') {
             $query->where('tipe_kos', $constraints['tipe_kos']);
-        }
-
-        // Listrik
-        if (isset($constraints['electricity_included']) && $constraints['electricity_included'] !== null) {
-            if ($constraints['electricity_included']) {
-                $query->where('all_facilities', 'like', '%Termasuk listrik%');
-            } else {
-                $query->where('all_facilities', 'like', '%Tidak termasuk listrik%');
-            }
         }
 
         $filtered = $query->get();
@@ -111,7 +90,6 @@ class RecommendationService
 
     /**
      * Constraint-Based Matching Score
-     * Score = (Jumlah Fasilitas Cocok / Total Permintaan) × 100%
      */
     private function calculateMatchScore(Kos $kos, array $requestedFacilities): array
     {
@@ -184,11 +162,6 @@ class RecommendationService
 
         if (!empty($constraints['facilities'])) {
             $desc[] = ['label' => 'Fasilitas', 'value' => implode(', ', $constraints['facilities']), 'icon' => 'bi-check2-circle'];
-        }
-
-        if (isset($constraints['electricity_included']) && $constraints['electricity_included'] !== null) {
-            $val = $constraints['electricity_included'] ? 'Termasuk Listrik' : 'Tidak Termasuk Listrik';
-            $desc[] = ['label' => 'Listrik', 'value' => $val, 'icon' => 'bi-lightning'];
         }
 
         return $desc;

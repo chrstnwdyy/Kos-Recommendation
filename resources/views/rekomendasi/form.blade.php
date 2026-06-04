@@ -62,17 +62,6 @@
     .tipe-card input  { display: none; }
     .tipe-card i      { font-size: 1.8rem; display: block; margin-bottom: 6px; }
 
-    /* Listrik radio */
-    .listrik-opt {
-        flex: 1; border: 2px solid var(--border);
-        border-radius: 10px; padding: 12px;
-        text-align: center; cursor: pointer;
-        transition: all 0.2s;
-    }
-    .listrik-opt:hover  { border-color: var(--primary); }
-    .listrik-opt.active { border-color: var(--primary); background: #EEF2FF; color: var(--primary); }
-    .listrik-opt input  { display: none; }
-
     /* Summary panel */
     .summary-item {
         display: flex; align-items: flex-start; gap: 10px;
@@ -84,7 +73,6 @@
 
 @section('content')
 
-<!-- Hero -->
 <section class="form-hero">
     <div class="container text-center">
         <div class="chip mx-auto mb-3" style="background:rgba(255,255,255,0.2);color:#fff;">
@@ -99,13 +87,12 @@
     <div class="container" style="max-width: 860px;">
         <div class="form-card">
 
-            <!-- Step Tabs -->
             <div class="d-flex gap-2 mb-4 flex-wrap" id="stepTabs">
                 <div class="step-tab active" data-step="1" onclick="goStep(1)">
                     <div class="step-num">1</div> Budget & Wilayah
                 </div>
                 <div class="step-tab" data-step="2" onclick="goStep(2)">
-                    <div class="step-num">2</div> Tipe & Listrik
+                    <div class="step-num">2</div> Tipe Kos
                 </div>
                 <div class="step-tab" data-step="3" onclick="goStep(3)">
                     <div class="step-num">3</div> Fasilitas
@@ -118,12 +105,10 @@
             <form action="{{ route('rekomendasi.hasil') }}" method="POST" id="mainForm">
                 @csrf
 
-                <!-- ── STEP 1: Budget & Wilayah ── -->
                 <div class="step-panel active" id="step1">
                     <h5 class="fw-700 mb-1">💰 Budget & Lokasi</h5>
                     <p class="text-muted small mb-4">Tentukan anggaran bulanan dan wilayah yang diinginkan</p>
 
-                    <!-- Budget Max Slider -->
                     <div class="mb-4">
                         <label class="fw-600 mb-2">Budget Maksimum per Bulan <span class="text-danger">*</span></label>
                         <div class="budget-display" id="budgetDisplay">Rp 2.000.000</div>
@@ -134,7 +119,6 @@
                             <small class="text-muted">Rp 300.000</small>
                             <small class="text-muted">Rp 10.000.000</small>
                         </div>
-                        <!-- Quick presets -->
                         <div class="d-flex gap-2 mt-2 flex-wrap">
                             @foreach([500000,1000000,1500000,2000000,3000000,5000000] as $preset)
                             <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill budget-preset"
@@ -145,7 +129,6 @@
                         </div>
                     </div>
 
-                    <!-- Budget Min (optional) -->
                     <div class="mb-4">
                         <label class="fw-600 small mb-1">Budget Minimum (opsional)</label>
                         <div class="input-group" style="max-width:280px;">
@@ -155,7 +138,6 @@
                         </div>
                     </div>
 
-                    <!-- Region -->
                     <div class="mb-4">
                         <label class="fw-600 mb-2">Wilayah / Kota</label>
                         <div class="row g-2">
@@ -187,12 +169,10 @@
                     </div>
                 </div>
 
-                <!-- ── STEP 2: Tipe & Listrik ── -->
                 <div class="step-panel" id="step2">
-                    <h5 class="fw-700 mb-1">🏠 Tipe Kos & Listrik</h5>
-                    <p class="text-muted small mb-4">Pilih tipe kos yang sesuai dan preferensi listrik</p>
+                    <h5 class="fw-700 mb-1">🏠 Tipe Kos</h5>
+                    <p class="text-muted small mb-4">Pilih tipe kos yang sesuai</p>
 
-                    <!-- Tipe Kos -->
                     <div class="mb-4">
                         <label class="fw-600 mb-3">Tipe Kos</label>
                         <div class="tipe-card-wrap">
@@ -218,30 +198,6 @@
                         </div>
                     </div>
 
-                    <!-- Listrik -->
-                    <div class="mb-4">
-                        <label class="fw-600 mb-3">Preferensi Listrik</label>
-                        <div class="d-flex gap-3 flex-wrap">
-                            <label class="listrik-opt active flex-fill">
-                                <input type="radio" name="electricity_included" value="" checked>
-                                <i class="bi bi-question-circle fs-4 d-block mb-1 text-muted"></i>
-                                <div class="fw-600 small">Tidak Dipilih</div>
-                            </label>
-                            <label class="listrik-opt flex-fill">
-                                <input type="radio" name="electricity_included" value="ya">
-                                <i class="bi bi-lightning-charge-fill fs-4 d-block mb-1 text-warning"></i>
-                                <div class="fw-600 small">Termasuk Listrik</div>
-                                <div class="text-muted" style="font-size:0.7rem;">Harga sudah termasuk</div>
-                            </label>
-                            <label class="listrik-opt flex-fill">
-                                <input type="radio" name="electricity_included" value="tidak">
-                                <i class="bi bi-plug fs-4 d-block mb-1 text-muted"></i>
-                                <div class="fw-600 small">Tidak Termasuk</div>
-                                <div class="text-muted" style="font-size:0.7rem;">Bayar terpisah</div>
-                            </label>
-                        </div>
-                    </div>
-
                     <div class="d-flex justify-content-between">
                         <button type="button" class="btn btn-outline-secondary px-4" onclick="goStep(1)">
                             <i class="bi bi-arrow-left me-1"></i> Kembali
@@ -252,12 +208,10 @@
                     </div>
                 </div>
 
-                <!-- ── STEP 3: Fasilitas ── -->
                 <div class="step-panel" id="step3">
                     <h5 class="fw-700 mb-1">✨ Fasilitas yang Diinginkan</h5>
                     <p class="text-muted small mb-3">Pilih fasilitas yang penting bagi Anda. Semakin banyak dipilih, skor matching lebih selektif.</p>
 
-                    <!-- Fasilitas selected count -->
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <span class="text-muted small">Fasilitas terpilih: <strong id="facCount" class="text-primary">0</strong></span>
                         <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="clearFacilities()">
@@ -311,14 +265,12 @@
                     </div>
                 </div>
 
-                <!-- ── STEP 4: Konfirmasi ── -->
                 <div class="step-panel" id="step4">
                     <h5 class="fw-700 mb-1">✅ Konfirmasi Preferensi</h5>
                     <p class="text-muted small mb-4">Pastikan semua preferensi sudah sesuai sebelum mencari</p>
 
                     <div id="summaryPanel" class="mb-4 p-3 rounded-3" style="background:#F8FAFC;border:1px solid var(--border);">
-                        <!-- Filled by JS -->
-                    </div>
+                        </div>
 
                     <div class="p-3 rounded-3 mb-4" style="background:#EEF2FF;border:1px solid #C7D2FE;">
                         <div class="d-flex gap-3">
@@ -422,15 +374,6 @@ document.querySelectorAll('.tipe-card').forEach(card => {
     });
 });
 
-// ── Listrik opts ───────────────────────────────────────────────
-document.querySelectorAll('.listrik-opt').forEach(opt => {
-    opt.addEventListener('click', () => {
-        document.querySelectorAll('.listrik-opt').forEach(o => o.classList.remove('active'));
-        opt.classList.add('active');
-        opt.querySelector('input').checked = true;
-    });
-});
-
 // ── Facility count ─────────────────────────────────────────────
 function updateFacCount() {
     const count = document.querySelectorAll('.fac-cb:checked').length;
@@ -452,9 +395,6 @@ function buildSummary() {
     const budgetMin = document.querySelector('[name=budget_min]').value;
     const region   = document.querySelector('[name=region]:checked')?.value || 'Semua Wilayah';
     const tipe     = document.querySelector('[name=tipe_kos]:checked')?.value || 'Semua Tipe';
-    const elecEl   = document.querySelector('[name=electricity_included]:checked');
-    const elecVal  = elecEl?.value;
-    const elecText = elecVal === 'ya' ? 'Termasuk Listrik' : elecVal === 'tidak' ? 'Tidak Termasuk' : 'Tidak Dipilih';
     const facs     = [...document.querySelectorAll('.fac-cb:checked')].map(c => c.value);
 
     let html = '';
@@ -471,7 +411,6 @@ function buildSummary() {
     if (budgetMin && budgetMin > 0) html += row('bi-cash', 'Budget Minimum', formatRp(budgetMin));
     html += row('bi-geo-alt-fill', 'Wilayah', region || 'Semua Wilayah');
     html += row('bi-house', 'Tipe Kos', tipe === 'semua' ? 'Semua Tipe' : tipe);
-    html += row('bi-lightning', 'Listrik', elecText);
 
     if (facs.length > 0) {
         const pills = facs.map(f => `<span class="chip me-1 mb-1">${f}</span>`).join('');
